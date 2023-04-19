@@ -118,11 +118,188 @@ SELECT FIRST_NAME ,
                 SALARY , 
                 SALARY/30 , 
                 ROUND(SALARY/30) AS "DAILY SALARY",
-                ROUND(SALARY/30 , 3) --- OVERLOADED FUNCTION: Number 3 defines how many decimal points you want to keep
+                ROUND(SALARY/30 , 3) -- OVERLOADED FUNCTION: Number 3 defines how many decimal points you want to keep after dot (.)
 FROM EMPLOYEES;
 
 
+-- Multi Row Functions  | Group Function  | Aggregate Function
+-- COUNT , MAX , MIN , SUM , AVG
+SELECT COUNT(FIRST_NAME) 
+FROM EMPLOYEES; --- 106 total row numbers
 
--- Multi Row Functions
+--SINCE IT DOES NOT MATTER WHAT COLUMN YOU USE TO COUNT THE ROW (IF IT DOES NOT HAVE NULL VALUE
+-- SO WE CAN REPLACE THE COLUMN NAME WITH *
+
+SELECT COUNT(*) AS "EMPLOYEE COUNT"
+FROM EMPLOYEES;
+
+---COUNT USING DEPARTMENT_ID COLUMN : COUNT DOES NOT COUNT NULL VALUES
+SELECT COUNT(DEPARTMENT_ID) --- 105 ROWS BECAUSE KIMBERLY DOES NOT HAVE DEPARTMENT_ID (NULL)
+FROM EMPLOYEES;
+
+---COUNT USING COMMISSION_PCT COLUMN
+SELECT COUNT(COMMISSION_PCT) --- 35 ROWS BECAUSE THERE ARE MANY NULL VALUES IN THE COLUMN
+FROM EMPLOYEES;
+
+-- IF YOU WANT TO GET ALL ROWS , ALWAYS USE COUNT(*) INSTEAD
+
+--Get max salary , Min salary , Avg and Sum of Salary from employees table
+
+SELECT MAX(SALARY)
+FROM EMPLOYEES;
+
+SELECT MIN(SALARY)
+FROM EMPLOYEES;
+
+SELECT SUM(SALARY)
+FROM EMPLOYEES;
+
+-- Get average and round it up
+SELECT AVG(SALARY) , ROUND(AVG(SALARY), 2)
+FROM EMPLOYEES;
+
+-- since we are aggregating the result of employees table we can do all in one shot
+SELECT COUNT(*) AS "EMPLOYEE COUNT", 
+                MAX(SALARY) AS "HIGHEST SALARY", 
+                MIN(SALARY) AS "LOWEST SALARY", 
+                SUM(SALARY) AS "TOTAL SALARY", 
+                ROUND(AVG(SALARY)) AS "AVERAGE SALARY"
+FROM EMPLOYEES;
+
+--THIS SENTENCE DOES NOT MAKE SENSE IN ENGLISH!
+SELECT FIRST_NAME , MAX(SALARY)
+FROM EMPLOYEES;
+
+-- MULTI ROW FUNCTIONS  | GROUP FUNCTION  | AGGREGATE FUNCTION (ALL SAME THING)
+--if nothing is specified , group function will return one result for whole table
+-- We can however , divide the result using GROUP BY COLUMN_YOU_WANT_GROUP_BY
+-- then it will return one result per group
+--GROUP BY CAN ONLY BE USED ALONG WITH GROUP FUNCTIONS (COUNT , MAX , MIN , SUM, AVG)
+
+--Find out employee count for each department
+SELECT DEPARTMENT_ID , COUNT(*)
+FROM EMPLOYEES
+GROUP BY DEPARTMENT_ID
+--ORDER THE RESULT BY 1ST COLUMN
+ORDER BY 1
+;
+
+--Find employee count for each job_id from employees table
+SELECT  JOB_ID , COUNT(*)
+FROM EMPLOYEES
+GROUP BY JOB_ID;
+
+--Find max salary of each department in Employees table
+SELECT DEPARTMENT_ID , MAX(SALARY)
+FROM EMPLOYEES
+GROUP BY DEPARTMENT_ID
+ORDER BY 1;
+
+--Find sum of salary of each department in Employees table
+SELECT DEPARTMENT_ID , SUM(SALARY)
+FROM EMPLOYEES
+GROUP BY DEPARTMENT_ID
+ORDER BY 1;
+
+--Find sum of salary of each JOB_ID in Employees table
+SELECT JOB_ID , SUM(SALARY)
+FROM EMPLOYEES
+GROUP BY JOB_ID;
+
+--USING MULTIPLE GROUP FUNCTIONS IN ONE SELECT
+SELECT DEPARTMENT_ID , SUM(SALARY) , 
+                MAX(SALARY) , 
+                MIN(SALARY) , 
+                AVG (SALARY) , 
+                ROUND(AVG(SALARY) , 2) , 
+                COUNT(*)
+FROM EMPLOYEES
+GROUP BY DEPARTMENT_ID
+ORDER BY 1;
+
+--1. Find how many countries in each region using Countries Table
+SELECT REGION_ID , COUNT(*)
+FROM COUNTRIES
+GROUP BY REGION_ID
+ORDER BY 1;
+
+--2. Find how many departments in each locations using Departments Table
+SELECT DEPARTMENT_NAME , COUNT(*)
+FROM DEPARTMENTS
+GROUP BY DEPARTMENT_NAME;
+
+-- 3. Find how many Locations in each Country using Locations table
+--it should display these 2 columns : Country_ID and count
+--3.1. Filter above result only display if the count us more than 3
+SELECT COUNTRY_ID , COUNT(*)
+FROM LOCATIONS
+GROUP BY COUNTRY_ID
+HAVING COUNT(*) > 3;
+
+--4. Find how many employees each manager has using employees table
+SELECT MANAGER_ID , COUNT(*)
+FROM EMPLOYEES
+GROUP BY MANAGER_ID
+ORDER BY 1;
+
+
+--if we want to further filter already aggregated (grouped) result after the GROUP BY
+--WE CAN USE HAVING
+--GROUP BY SOME_COLUMN
+--HAVING SOME_CONDITION IS TRUE
+--HAVING can not be used alone by itself and it must be followed by GROUP BY
+--In order to put condition on aggregated result, we must use HAVING instead of WHERE
+
+
+--FIND OUT THE COUNT OF EMPLOYEE IN EACH DEPARTMENT
+-- ONLY DISPLAY THE RESULT IF THE COUNT IS MORE THAN 5
+SELECT DEPARTMENT_ID , COUNT(*)
+FROM EMPLOYEES
+GROUP BY DEPARTMENT_ID
+HAVING COUNT(*) > 5; 
+
+--FIND OUT THE SUM OF ALL EMPLOYEE SALARY IN EACH DEPARTMENT
+-- ONLY DISPLAY THE RESULT IF THE SUM IS MORE THAN 100000
+SELECT DEPARTMENT_ID , SUM(SALARY)
+FROM EMPLOYEES
+GROUP BY DEPARTMENT_ID
+HAVING SUM(SALARY) > 100000;
+
+--FIND OUT THE AVERAGE OF ALL EMPLOYEE SALARY IN EACH DEPARTMENT
+-- ONLY DISPLAY THE RESULT IF THE AVERAGE IS MORE THAN 10000
+SELECT DEPARTMENT_ID , ROUND(AVG(SALARY))
+FROM EMPLOYEES
+GROUP BY DEPARTMENT_ID
+HAVING AVG(SALARY) > 10000;
+
+--FIND THE COUNT OF EMPLOYEES MAKES MORE THAN 10000
+SELECT COUNT(*) FROM EMPLOYEES
+WHERE SALARY > 10000;
+
+
+--GROUP THE RESULT BY JOB_ID
+SELECT JOB_ID , COUNT(*)
+FROM EMPLOYEES
+WHERE SALARY > 10000 -- If the condition is not related to aggregated result you can just use WHERE
+GROUP BY JOB_ID;
+
+--When do we use HAVING ---> When the condition includes an aggregated result
+-- Filter above result if employee count is exactly 1
+SELECT JOB_ID , COUNT(*)
+FROM EMPLOYEES
+WHERE SALARY > 10000
+GROUP BY JOB_ID
+HAVING COUNT(*) = 1;-- If the condition is related to aggregated result you MUST use HAVING
+
+--5. Find  frequency of First_Name in Employees table
+--In another term , find out COUNT of each FIRST_NAME in employees table
+--Only display FIRST_NAMES that showed up more than once
+SELECT FIRST_NAME , COUNT(*)
+FROM EMPLOYEES
+GROUP BY FIRST_NAME
+HAVING COUNT(*) > 1;
+
+--GROUP BY and HAVING can only be used if you have group functions in SELECT
+-- so the result can be grouped by the column you specified and further filtered using HAVING
 
 
