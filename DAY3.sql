@@ -43,12 +43,12 @@ FROM DEPARTMENTS
 WHERE DEPARTMENT_ID = 90;
 
 --- SQL JOIN
---- INNER JOIN - joins matching part in both tables (PRIMARY KEY and FOREIGN KEY relationship)
+--- INNER JOIN - returns only the data that match in both tables according to condition (PRIMARY KEY and FOREIGN KEY relationship)
 
 SELECT EMPLOYEES.FIRST_NAME , EMPLOYEES.DEPARTMENT_ID , DEPARTMENTS.DEPARTMENT_NAME
 FROM EMPLOYEES
 INNER JOIN DEPARTMENTS ON EMPLOYEES.DEPARTMENT_ID = DEPARTMENTS.DEPARTMENT_ID;
---kimberly with null DEPARTMENT_ID is not included because there is no PRIMARY KEY with null in DEPARTMENTS table
+--kimberly with null DEPARTMENT_ID is not included because there is no PRIMARY KEY with null in DEPARTMENTS table (does not match)
 
 --We can simplify above query by providing alias (nickname) to table
 --
